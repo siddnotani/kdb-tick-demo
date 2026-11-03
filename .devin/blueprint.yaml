@@ -1,8 +1,4 @@
 initialize:
-  - name: Python 3.11
-    uses: github.com/actions/setup-python@v5
-    with:
-      python-version: "3.11"
   - name: KDB-X Community Edition (q)
     run: |
       # Needs the KDB_LICENSE_KEY secret (base64 kc.lic). Skipped until scripts/ is on main.
