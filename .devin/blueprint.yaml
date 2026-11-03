@@ -1,0 +1,23 @@
+initialize:
+  - name: KDB-X Community Edition (q)
+    run: |
+      # Needs the KDB_LICENSE_KEY secret (base64 kc.lic). Skipped until scripts/ is on main.
+      [ -x scripts/install_kdbx.sh ] && scripts/install_kdbx.sh || echo "skipping KDB-X install"
+
+maintenance: |
+  [ -f requirements.txt ] && pip install -r requirements.txt || true
+
+knowledge:
+  - name: lint
+    contents: |
+      ruff check . && ruff format --check .
+  - name: test
+    contents: |
+      q tests/q/run.q -q && pytest -q
+  - name: startup
+    contents: |
+      scripts/start.sh   # tp :5010, rdb :5011, hdb :5012; stop with scripts/stop.sh
+      uvicorn app.main:app --port 8000   # Swagger at /docs
+  - name: notes
+    contents: |
+      q is at ~/.kx/bin/q. Never print KDB_LICENSE_KEY. Run q processes from the repo root (relative loads).
