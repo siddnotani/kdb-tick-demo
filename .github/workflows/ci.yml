@@ -20,3 +20,25 @@ jobs:
         run: ruff check . && ruff format --check .
       - name: Test (pytest; end-to-end test skips without q)
         run: pytest -q
+
+  kdb:
+    name: q tests & end-to-end
+    runs-on: ubuntu-latest
+    env:
+      KDB_LICENSE_KEY: ${{ secrets.KDB_LICENSE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Install KDB-X Community Edition
+        if: env.KDB_LICENSE_KEY != ''
+        run: scripts/install_kdbx.sh && echo "$HOME/.kx/bin" >> "$GITHUB_PATH"
+      - name: q unit tests
+        if: env.KDB_LICENSE_KEY != ''
+        run: q tests/q/run.q -q
+      - name: End-to-end (real tick stack + API)
+        if: env.KDB_LICENSE_KEY != ''
+        run: pytest -q tests/test_integration.py

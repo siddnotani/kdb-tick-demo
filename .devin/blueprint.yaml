@@ -1,0 +1,20 @@
+initialize:
+  - name: Python 3.11
+    uses: github.com/actions/setup-python@v5
+    with:
+      python-version: "3.11"
+  - name: KDB-X Community Edition (q)
+    run: |
+      # needs the KDB_LICENSE_KEY secret (base64 kc.lic); guarded until scripts/ is on main
+      [ -x scripts/install_kdbx.sh ] && scripts/install_kdbx.sh || echo "skipping KDB-X install"
+
+maintenance: |
+  [ -f requirements.txt ] && pip install -r requirements.txt || true
+
+knowledge: |
+  q is installed at ~/.kx/bin/q (on PATH via ~/.bashrc). Never print KDB_LICENSE_KEY.
+  Lint: ruff check . && ruff format --check .
+  Test: q tests/q/run.q -q && pytest -q
+  Run:  scripts/start.sh  (tp :5010, rdb :5011, hdb :5012), then uvicorn app.main:app --port 8000 (Swagger at /docs)
+  Stop: scripts/stop.sh
+  Run every q process from the repo root: tick.q and q/*.q load files by relative path.
